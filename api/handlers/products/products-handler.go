@@ -112,13 +112,14 @@ func (me *productsHandler) AddReview(ctx *gin.Context) {
 	}
 
 	var err error
-	// Set the product id created in the db
-	_, err = me.productRepo.AddReview(productID, &models.ProductReview{
+	reviewUpsert := &models.ProductReview{
 		ID:                primitive.NewObjectID(),
 		ReviewerName:      reviewRequestModel.ReviewerName,
 		ReviewDescription: reviewRequestModel.ReviewDescription,
 		ReviewRating:      reviewRequestModel.ReviewRating,
-	})
+	}
+	// Set the product id created in the db
+	_, err = me.productRepo.AddReview(productID, reviewUpsert)
 	if err != nil {
 		fmt.Println(err)
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, models.AppError{
@@ -129,6 +130,6 @@ func (me *productsHandler) AddReview(ctx *gin.Context) {
 	}
 
 	// response with status created and the product requested to create
-	ctx.JSON(http.StatusCreated, nil)
+	ctx.JSON(http.StatusCreated, reviewUpsert)
 
 }

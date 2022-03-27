@@ -17,7 +17,7 @@ func InitialiseRouter(engine *gin.Engine) {
 	apiV1.Use(middleware.AuthMiddleware())
 
 	// health check API
-	apiV1.GET("/healthcheck", healthcheck)
+	engine.GET("/healthcheck", healthcheck)
 
 	// Register Product handlers
 	products.RegisterProductsReviewRoutes(apiV1)
