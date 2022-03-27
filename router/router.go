@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/aamilineni/go-products-review/api/handlers/products"
-	"github.com/aamilineni/go-products-review/api/handlers/productsreview"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,9 +17,6 @@ func InitialiseRouter(engine *gin.Engine) {
 
 	// Register Product handlers
 	products.RegisterProductsReviewRoutes(apiV1)
-
-	// Register Product Review handlers
-	productsreview.RegisterProductsReviewRoutes(apiV1)
 
 }
 
