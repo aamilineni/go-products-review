@@ -20,14 +20,11 @@ To install go-products-review, you need to install [Go](https://golang.org/)(**v
 
 Clone the project, And navigate to the project.
 
----
-```markdown
-$ 
 ```
----
+$ git clone https://github.com/aamilineni/go-products-review
+$ cd go-products-review
+```
 
----
-```go
 To run the web app locally, you need to have mongodb connection:
 and set the environment variables as 
 
@@ -45,40 +42,29 @@ After setting the env variables, run the below command to run app in local:
 $ go run .
 ```
 
-```
----
-
 Once you run the app, to health check you can make the following cURL
 
----
-```markdown
+```
 curl --location --request GET 'http://localhost:8080/healthcheck'
 ```
----
 To run all the test cases written
 
----
-```markdown
+```
 $ make test
 ```
----
 To run test coverage
 
+```
 $ make test_coverage
+```
 
 This project also supports Docker-Compose, to run the app using docker-compose 
 
----
-```markdown
+```
 $ docker-compose up
 ```
----
 
----
-```go
 If the docker has some cache, run the following command
-```
----
 
 ```
 $ docker-compose down && docker-compose build --no-cache && docker-compose up
@@ -157,3 +143,5 @@ Benchmarking for this application is not done.
 
 ## 7. Limitations
 1. The server is running on http mode.
+2. Add more test cases.
+3. Use oAuth instead of Basic Auth token
