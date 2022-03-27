@@ -17,7 +17,7 @@ func InitialiseServer(r *gin.Engine) {
 	defer stop()
 
 	srv := &http.Server{
-		Addr:    ":7070",
+		Addr:    ":8080",
 		Handler: r,
 	}
 

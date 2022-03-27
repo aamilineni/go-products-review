@@ -1,0 +1,4 @@
+package constants
+
+const AUTH_USERNAME = "AUTH_USERNAME"
+const AUTH_PASSWORD = "AUTH_PASSWORD"

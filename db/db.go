@@ -23,7 +23,7 @@ var mongoOnce sync.Once
 
 //I have used below constants just to hold required database config's.
 const (
-	CONNECTIONSTRING   = "mongodb://localhost:27017"
+	CONNECTIONSTRING   = "mongodb://mongodb"
 	DB                 = "db_products"
 	PRODUCTSCOLLECTION = "products"
 )
