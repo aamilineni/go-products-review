@@ -12,5 +12,6 @@ RUN CGO_ENABLED=0 go build -o go-products-review
 # Set the environment variables for basic auth token
 ENV AUTH_USERNAME=IDT
 ENV AUTH_PASSWORD=password
+ENV MONGO_CONNECTION_URI=mongodb
 
 CMD ["./go-products-review"]

@@ -25,6 +25,29 @@ Clone the project, And navigate to the project.
 $ 
 ```
 ---
+
+---
+```go
+To run the web app locally, you need to have mongodb connection:
+and set the environment variables as 
+
+```
+export AUTH_USERNAME=IDT
+export AUTH_PASSWORD=password
+export MONGO_CONNECTION_URI=localhost:27017
+```
+
+Change the Mongo Connection URI if needed. 
+
+After setting the env variables, run the below command to run app in local:
+
+```
+$ go run .
+```
+
+```
+---
+
 Once you run the app, to health check you can make the following cURL
 
 ---

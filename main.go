@@ -16,6 +16,7 @@ func main() {
 	// Check whether the username & password is supplied as
 	username := os.Getenv(constants.AUTH_USERNAME)
 	password := os.Getenv(constants.AUTH_PASSWORD)
+	mongodbConnection := os.Getenv(constants.MONGO_CONNECTION_URI)
 
 	if username == "" {
 		log.Fatal("basic auth username must be provided")
@@ -23,6 +24,10 @@ func main() {
 
 	if password == "" {
 		log.Fatal("basic auth password must be provided")
+	}
+
+	if mongodbConnection == "" {
+		log.Fatal("mongodb connection uri must be provided")
 	}
 
 	// Initialise Database

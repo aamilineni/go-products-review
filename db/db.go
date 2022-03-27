@@ -2,11 +2,14 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
 	"sync"
 	"time"
 
 	"github.com/aamilineni/go-products-review/api/models"
+	"github.com/aamilineni/go-products-review/constants"
 	"github.com/jaswdr/faker"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -23,7 +26,6 @@ var mongoOnce sync.Once
 
 //I have used below constants just to hold required database config's.
 const (
-	CONNECTIONSTRING   = "mongodb://mongodb"
 	DB                 = "db_products"
 	PRODUCTSCOLLECTION = "products"
 )
@@ -32,8 +34,9 @@ const (
 func GetMongoClient() *mongo.Client {
 	//Perform connection creation operation only once.
 	mongoOnce.Do(func() {
+		uri := fmt.Sprintf("mongodb://%s", os.Getenv(constants.MONGO_CONNECTION_URI))
 		// Set client options
-		clientOptions := options.Client().ApplyURI(CONNECTIONSTRING)
+		clientOptions := options.Client().ApplyURI(uri)
 		// Connect to MongoDB
 		client, err := mongo.Connect(context.TODO(), clientOptions)
 		if err != nil {
