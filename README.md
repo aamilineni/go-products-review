@@ -122,7 +122,7 @@ curl --location --request GET 'http://localhost:8080/api/v1/products?page=1&limi
 --header 'Authorization: Basic SURUOnBhc3N3b3Jk'
 ```
 ---
-3. Create new sale
+3. Create new Product Review
 
 ---
 ```markdown
