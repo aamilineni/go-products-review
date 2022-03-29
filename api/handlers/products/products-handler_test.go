@@ -186,29 +186,17 @@ func Test_AddReview_For_Invalid_Product(t *testing.T) {
 	assert.Equal(t, w.Result().StatusCode, http.StatusInternalServerError)
 }
 
-func getMockProducts(count int) []models.Product {
+func getMockProducts(count int) []models.ProductResponseModel {
 
 	faker := faker.New()
-	products := []models.Product{}
+	products := []models.ProductResponseModel{}
 	for i := 0; i < count; i++ {
-		products = append(products, models.Product{
-			ID:          primitive.NewObjectID(),
-			Name:        faker.Company().Name(),
-			Description: faker.Lorem().Text(50),
-			Reviews: []models.ProductReview{
-				{
-					ID:                primitive.NewObjectID(),
-					ReviewerName:      faker.Beer().Name(),
-					ReviewDescription: faker.Lorem().Text(50),
-					ReviewRating:      faker.IntBetween(0, 5),
-				},
-				{
-					ID:                primitive.NewObjectID(),
-					ReviewerName:      faker.Beer().Name(),
-					ReviewDescription: faker.Lorem().Text(50),
-					ReviewRating:      faker.IntBetween(0, 5),
-				},
-			},
+		products = append(products, models.ProductResponseModel{
+			ID:            primitive.NewObjectID(),
+			Name:          faker.Company().Name(),
+			Description:   faker.Lorem().Text(50),
+			ThumbnailURL:  faker.Car().Maker(),
+			AverageRating: faker.Float64(5, 0, 5),
 		})
 	}
 	return products

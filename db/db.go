@@ -28,6 +28,7 @@ var mongoOnce sync.Once
 const (
 	DB                 = "db_products"
 	PRODUCTSCOLLECTION = "products"
+	REVIEWCOLLECTION   = "reviews"
 )
 
 //GetMongoClient - Return mongodb connection to work with
@@ -97,7 +98,6 @@ func seedProducts(ctx context.Context) {
 			Name:         faker.Company().Name(),
 			Description:  faker.Lorem().Paragraph(2),
 			ThumbnailURL: faker.Internet().URL(),
-			Reviews:      []models.ProductReview{},
 		}
 		products = append(products, product)
 	}

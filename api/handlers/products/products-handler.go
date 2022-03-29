@@ -38,10 +38,10 @@ func (me *productsHandler) Add(ctx *gin.Context) {
 	var err error
 	// Set the product id created in the db
 	productRequestModel.ID, err = me.productRepo.Add(&models.Product{
-		ID:          primitive.NewObjectID(),
-		Name:        productRequestModel.Name,
-		Description: productRequestModel.Description,
-		Reviews:     []models.ProductReview{},
+		ID:           primitive.NewObjectID(),
+		Name:         productRequestModel.Name,
+		Description:  productRequestModel.Description,
+		ThumbnailURL: productRequestModel.ThumbnailURL,
 	})
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, models.AppError{

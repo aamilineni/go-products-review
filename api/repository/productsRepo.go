@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // creates new productsRepo interface
@@ -39,14 +38,7 @@ func (me *productsRepository) GetBy(productName string, pageNumber int64, limit 
 
 	filter := bson.M{}
 	if productName != "" {
-		filter = bson.M{
-			"name": bson.M{
-				"$regex": primitive.Regex{
-					Pattern: productName,
-					Options: "i",
-				},
-			},
-		}
+		filter = bson.M{"name": bson.M{"$regex": primitive.Regex{Pattern: productName, Options: "i"}}}
 	}
 
 	// find the count of all the documents in a collection
@@ -55,18 +47,63 @@ func (me *productsRepository) GetBy(productName string, pageNumber int64, limit 
 		return nil, err
 	}
 
-	// set pagination options
-	findOptions := &options.FindOptions{}
-	findOptions.SetSkip((pageNumber - 1) * limit)
-	findOptions.SetLimit(limit)
+	var basePipeline = mongo.Pipeline{}
+
+	if productName != "" {
+		subpipeline := bson.D{{"$match", bson.D{{"$and", bson.A{bson.D{{"name", bson.M{"$regex": primitive.Regex{Pattern: productName, Options: "i"}}}}}}}}}
+		basePipeline = append(basePipeline, subpipeline)
+	}
+
+	// lookup for join
+	lookup := bson.D{
+		{"$lookup", bson.D{
+			{"from", "reviews"},
+			{"localField", "_id"},
+			{"foreignField", "productID"},
+			{"as", "averagereviews"},
+		}},
+	}
+	basePipeline = append(basePipeline, lookup)
+
+	// unwind
+	unwindStage := bson.D{{"$unwind", bson.D{{"path", "$averagereviews"}, {"preserveNullAndEmptyArrays", true}}}}
+	basePipeline = append(basePipeline, unwindStage)
+
+	// group
+	group := bson.D{
+		{
+			"$group", bson.D{
+				{"_id", "$_id"},
+				{"name", bson.D{{"$first", "$name"}}},
+				{"description", bson.D{{"$first", "$description"}}},
+				{"thumbnail_url", bson.D{{"$first", "$thumbnail_url"}}},
+				{"average_rating", bson.D{{"$avg", "$averagereviews.rating"}}},
+			},
+		},
+	}
+	basePipeline = append(basePipeline, group)
+
+	// sort on id
+	sort := bson.D{
+		{
+			"$sort", bson.M{"_id": 1},
+		},
+	}
+	basePipeline = append(basePipeline, sort)
+
+	// for pagination
+	jumpPagePipeline := bson.D{{"$skip", (pageNumber - 1) * limit}}
+	limitPipeline := bson.D{{"$limit", limit}}
+	basePipeline = append(basePipeline, jumpPagePipeline)
+	basePipeline = append(basePipeline, limitPipeline)
 
 	// fetch from the collection based on the pagination & filtering options
-	cursor, err := collection.Find(ctx, filter, findOptions)
+	cursor, err := collection.Aggregate(ctx, basePipeline)
 	if err != nil {
 		return nil, err
 	}
 
-	var results []models.Product
+	var results []models.ProductResponseModel
 	if err = cursor.All(ctx, &results); err != nil {
 		return nil, err
 	}
@@ -104,34 +141,21 @@ func (me *productsRepository) Add(product *models.Product) (string, error) {
 func (me *productsRepository) AddReview(productID string, review *models.ProductReview) (string, error) {
 
 	//Create a handle to the respective collection in the database.
-	collection := me.db.Collection(db.PRODUCTSCOLLECTION)
+	collection := me.db.Collection(db.REVIEWCOLLECTION)
 	//Perform InsertOne operation & validate against the error.
 	id, err := primitive.ObjectIDFromHex(productID)
 	if err != nil {
 		return "", err
 	}
 
-	update := bson.M{
-		"$push": bson.M{
-			"reviews": bson.M{"$each": []models.ProductReview{{
-				ID:                primitive.NewObjectID(),
-				ReviewerName:      review.ReviewerName,
-				ReviewDescription: review.ReviewDescription,
-				ReviewRating:      review.ReviewRating,
-			}}},
-		},
-	}
-	result, err := collection.UpdateOne(
-		context.TODO(),
-		bson.M{"_id": id},
-		update,
-	)
+	review.ProductID = id
+	result, err := collection.InsertOne(context.TODO(), review)
 	if err != nil {
 		return "", err
 	}
 
 	// Return success without any error.
-	if oid, ok := result.UpsertedID.(primitive.ObjectID); ok {
+	if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
 		return oid.Hex(), nil
 	}
 
